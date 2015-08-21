@@ -18,6 +18,35 @@
     </head>
     <body>
         <section>
+			<div id="files"> 
+				Source file name:<input type="text" id="sourceFile"></input> <br>
+				<select id="destarea">
+				  <option value="mtp">MTP</option>
+				  <option value="media">Media</option>
+				  <option value="tivo">TiVo</option>
+				  <option value="marketing">Marketing</option>
+				</select>
+				
+				Destination file name:<input type="text" id="destinationFile"></input> <br>
+				Create backup? <input type="checkbox" checked="true" id="createbackup"> </input> <br>
+				<button onclick="StartCopy()">Copy</button>
+				
+			</div>
+			<div id="result">
+				<div id="backup">
+					BACKUP: <br>
+					Progress (%) : <span id="bkp_progress"></span> <br>
+					Speed (Mb/s) : <span id="bkp_speed"></span> <br>
+					ETA			 : <span id="bkp_eta"></span> <br>
+				</div> 
+				<br>
+				<div id="publish">
+					PUBLISHING: <br>
+					Progress (%) : <span id="prod_progress"></span> <br>
+					Speed (Mb/s) : <span id="prod_speed"></span> <br>
+					ETA			 : <span id="prod_eta"></span> <br>
+				</div>				
+			</div>
             <div id="perc">
                 
             </div>
@@ -26,10 +55,14 @@
         <script type="text/javascript" src="js/jquery.min.js"></script>
         <script type="text/javascript" src="js/jquery-asProgress.js"></script>
         <script type="text/javascript">
-            jQuery(document).ready(function($){		
-                var socket = io();
+		var socketId = "123";
+		var socket;
+            jQuery(document).ready(function($){
+				
+                socket = io();
 
                 socket.on('welcome', function(data) {
+					socketId = data.id;
                     socket.emit('i am client', {data: 'foo!', id: data.id});
                     socket.emit('test', {data: 'ttt', id:data.id})
                 });
@@ -38,8 +71,22 @@
                 });
                 socket.on('error', console.error.bind(console));
                 socket.on('message', console.log.bind(console));
-                                        
-            });
+
+            });	
+
+				function StartCopy() {
+					var sourceName = $('#sourceFile').val();
+					var destName = $('#destinationFile').val();
+					var area = $('#destarea option:selected').val();
+					var createBackup = $('#createbackup').is(":checked");
+					
+					
+					var params = { sourcename: sourceName,destname: destName, area: area, createbackup: createBackup, socketid: socketId };
+					console.log(params);
+					socket.emit('publishrequest', params );
+
+				}
+			
         </script>
     </body>
 </html>
