@@ -38,6 +38,7 @@
 					Progress (%) : <span id="bkp_progress"></span> <br>
 					Speed (Mb/s) : <span id="bkp_speed"></span> <br>
 					ETA			 : <span id="bkp_eta"></span> <br>
+					<span id="bkp_finished"></span> <br>
 				</div> 
 				<br>
 				<div id="publish">
@@ -45,6 +46,7 @@
 					Progress (%) : <span id="prod_progress"></span> <br>
 					Speed (Mb/s) : <span id="prod_speed"></span> <br>
 					ETA			 : <span id="prod_eta"></span> <br>
+					<span id="prod_finished"></span> <br>
 				</div>				
 			</div>
             <div id="perc">
@@ -66,9 +68,24 @@
                     socket.emit('i am client', {data: 'foo!', id: data.id});
                     socket.emit('test', {data: 'ttt', id:data.id})
                 });
+
                 socket.on('progress', function(data) {
-                    $('#id').text(data.progress.percentage)
-                });
+					var isBackup = data.isbackup;
+					var isFinished = data.finished;
+					
+					if( isBackup == false) {
+						if( isFinished == false) {
+							//$('#id').text(data.progress.percentage)
+							$('#bkp_progress').text((data.progress.percentage).toFixed(2) + '%')
+							$('#bkp_speed').text( (data.progress.speed / 1024 / 1024).toFixed(2));
+							$('#bkp_eta').text(data.progress.eta);
+							$('#bkp_finished').text('no');
+						} else {
+							$('#bkp_finished').text('FINISHED!');
+						}
+					}
+                });				
+				
                 socket.on('error', console.error.bind(console));
                 socket.on('message', console.log.bind(console));
 

@@ -45,8 +45,6 @@ io.on('connection', function(socket) {
     socket.on('i am client', console.log);
     
 	socket.on('publishrequest', function(socket) {
-	console.log(socket);
-	// { sourcename: sourceName,destname: destName, area: area, createbackup: createBackup, socketid: socketId };
 		console.log(socket.socketid)
 		var filename = socket.sourcename;
 		var output   = config.files.folder +  socket.area + '\\' + socket.destname;
@@ -54,7 +52,27 @@ io.on('connection', function(socket) {
 		
 		console.log(filename);
 		console.log(output);
-		console.log(createbackup);
+		console.log(createbackup);		
+		//if( createbackup == false) {
+			var stat = fs.statSync(filename);
+			var str = progress({
+				length: stat.size,
+				time: 100
+			});
+			
+			str.on('progress', function(progress) {
+				io.to(socket.socketid).emit('progress', { isbackup: false, finished: false, progress: progress } );
+			});
+
+			str.on('end', function(bla) {
+			console.log('end');
+				io.to(socket.socketid).emit('progress', { isbackup: false, finished: true, progress: {} } );
+			});
+			fs.createReadStream(filename)
+				.pipe(str)
+				.pipe(fs.createWriteStream(output));			
+				
+			//}
 
 /*		var stat = fs.statSync(filename);
 		var str = progress({
