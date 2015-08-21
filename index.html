@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="css/prelude.css">
+        <link rel="stylesheet" href="css/rainbow.css">
+        <link rel="stylesheet" href="css/progress.css">        
+        
+        
+        <script src='/socket.io/socket.io.js'></script>
+        <script>
+
+        </script>
+    </head>
+    <body>
+        <section>
+            <div id="perc">
+                
+            </div>
+        </section>        
+        <script type="text/javascript" src="js/rainbow.min.js"></script>
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery-asProgress.js"></script>
+        <script type="text/javascript">
+            jQuery(document).ready(function($){		
+                var socket = io();
+
+                socket.on('welcome', function(data) {
+                    socket.emit('i am client', {data: 'foo!', id: data.id});
+                    socket.emit('test', {data: 'ttt', id:data.id})
+                });
+                socket.on('progress', function(data) {
+                    $('#id').text(data.progress.percentage)
+                });
+                socket.on('error', console.error.bind(console));
+                socket.on('message', console.log.bind(console));
+                                        
+            });
+        </script>
+    </body>
+</html>
