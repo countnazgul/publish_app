@@ -8,18 +8,15 @@
         <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" href="css/prelude.css">
         <link rel="stylesheet" href="css/rainbow.css">
-        <link rel="stylesheet" href="css/progress.css">        
+        <link rel="stylesheet" href="css/progress.css">      
         
         
-        <script src='/socket.io/socket.io.js'></script>
-        <script>
-
-        </script>
+        <script src='/socket.io/socket.io.js'></script>        
     </head>
-    <body>
+    <body>                      
         <section>
 			<div id="files"> 
-				Source file name:<input type="text" id="sourceFile"></input> <br>
+				<input type="text" id="sourceFile" placeholder="Source file name"></input> <br>
 				<select id="destarea">
 				  <option value="mtp">MTP</option>
 				  <option value="media">Media</option>
@@ -27,8 +24,9 @@
 				  <option value="marketing">Marketing</option>
 				</select>
 				
-				Destination file name:<input type="text" id="destinationFile"></input> <br>
-				Create backup? <input type="checkbox" checked="true" id="createbackup"> </input> <br>
+				<input type="text" id="destinationFile" placeholder="Destination file name"></input> <br>
+				Create backup? <input type="checkbox" checked="true" id="createbackup" > </input> <br>
+                Replace file? <input type="checkbox" checked="false" id="replacefile"> </input> <br>
 				<button onclick="StartCopy()">Copy</button>
 				
 			</div>
@@ -49,61 +47,15 @@
 					<span id="prod_finished"></span> <br>
 				</div>				
 			</div>
-            <div id="perc">
-                
+            <div id="filelist">
+                <select name="folderfiles" size="10" id="folderfiles">
+                </select>                  
             </div>
         </section>        
         <script type="text/javascript" src="js/rainbow.min.js"></script>
         <script type="text/javascript" src="js/jquery.min.js"></script>
         <script type="text/javascript" src="js/jquery-asProgress.js"></script>
-        <script type="text/javascript">
-		var socketId = "123";
-		var socket;
-            jQuery(document).ready(function($){
-				
-                socket = io();
+        <script src='js/scripts.js'></script>
 
-                socket.on('welcome', function(data) {
-					socketId = data.id;
-                    socket.emit('i am client', {data: 'foo!', id: data.id});
-                    socket.emit('test', {data: 'ttt', id:data.id})
-                });
-
-                socket.on('progress', function(data) {
-					var isBackup = data.isbackup;
-					var isFinished = data.finished;
-					
-					if( isBackup == false) {
-						if( isFinished == false) {
-							//$('#id').text(data.progress.percentage)
-							$('#bkp_progress').text((data.progress.percentage).toFixed(2) + '%')
-							$('#bkp_speed').text( (data.progress.speed / 1024 / 1024).toFixed(2));
-							$('#bkp_eta').text(data.progress.eta);
-							$('#bkp_finished').text('no');
-						} else {
-							$('#bkp_finished').text('FINISHED!');
-						}
-					}
-                });				
-				
-                socket.on('error', console.error.bind(console));
-                socket.on('message', console.log.bind(console));
-
-            });	
-
-				function StartCopy() {
-					var sourceName = $('#sourceFile').val();
-					var destName = $('#destinationFile').val();
-					var area = $('#destarea option:selected').val();
-					var createBackup = $('#createbackup').is(":checked");
-					
-					
-					var params = { sourcename: sourceName,destname: destName, area: area, createbackup: createBackup, socketid: socketId };
-					console.log(params);
-					socket.emit('publishrequest', params );
-
-				}
-			
-        </script>
     </body>
 </html>

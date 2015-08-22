@@ -4,7 +4,11 @@ var index       = fs.readFileSync(__dirname + '/index.html');
 var progress    = require('progress-stream');
 var path        = require("path");
 var url         = require("url");
+var glob        = require("glob")
 var config      = require('./config');
+
+
+
 
 var app = http.createServer(function(request, response) {
 	var my_path = url.parse(request.url).pathname;
@@ -44,6 +48,13 @@ io.on('connection', function(socket) {
     socket.emit('welcome', { message: 'Welcome!', id: socket.id });
     socket.on('i am client', console.log);
     
+    socket.on('sendArea', function(sendArea) {
+        console.log('Area: ' + JSON.stringify(sendArea));
+        glob(config.files.folder + sendArea.area +  '\\*.*', function (er, files) {
+            io.to(sendArea.socketid).emit('filesList', { filesList: files } );
+        })				
+    });    
+    
 	socket.on('publishrequest', function(socket) {
 		console.log(socket.socketid)
 		var filename = socket.sourcename;
@@ -62,7 +73,7 @@ io.on('connection', function(socket) {
 			
 			str.on('progress', function(progress) {
 				io.to(socket.socketid).emit('progress', { isbackup: false, finished: false, progress: progress } );
-			});
+			});                
 
 			str.on('end', function(bla) {
 			console.log('end');
@@ -105,4 +116,5 @@ io.on('connection', function(socket) {
 	});    
     
 });
-app.listen(8000);
+app.listen(8000); 
+//console.log('Server started on port 8000')
